@@ -3,7 +3,7 @@ defmodule Servy.Handler do
       request
         |> parse
         |> route
-        |>format_response
+        |> format_response
   end
 
   def parse(request) do
@@ -13,12 +13,13 @@ defmodule Servy.Handler do
       |> String.split("\n")
       |> List.first
       |> String.split(" ");
+
     %{ method: method, path: path, resp_body: "" }
   end
 
   def route(conv) do
     # TODO: Create a new map that also has the response body:
-    %{ method: "GET", path: "/wildthings", resp_body: "Bears, Lions, Tigers" }
+    %{ conv | resp_body: "Bears, Lions, Tigers" }
   end
 
   def format_response(conv) do
@@ -26,9 +27,9 @@ defmodule Servy.Handler do
     """
     HTTP/1.1 200 OK
     Content-Type: text/html
-    Content-Length: 20
+    Content-Length: #{byte_size(conv.resp_body)}
 
-    Bears, Lions, Tigers
+    #{conv.resp_body}
     """
   end
 end
