@@ -3,6 +3,11 @@ defmodule Servy.Handler do
 
   @pages_path Path.expand("../../pages", __DIR__)
 
+  # import funcitons, only specifies only the functions we want and the arrity of that func
+
+  import Servy.Plugins, only: [rewrite_path: 1, log: 1, track: 1]
+  import Servy.Parser, only: [parse: 1]
+
   @doc "transforms a request into a resp"
   def handle(request) do
       request
@@ -13,39 +18,6 @@ defmodule Servy.Handler do
       |> track
       |> format_response
   end
-
-  @doc "logs 404 req"
-  def track (%{status: 404, path: path} = conv) do
-    IO.puts "Warning #{path} is on the loose!"
-    conv
-  end
-
-  def track(conv), do: conv
-
-  def rewrite_path(%{path: "/wildlife"} = conv) do
-    %{ conv | path: "/wildthings" }
-  end
-
-  def rewrite_path(conv), do: conv
-
-  def log(conv), do: IO.inspect conv
-
-  def parse(request) do
-    # TODO: Parse the request string into a map:
-    [method, path, _] =
-      request
-      |> String.split("\n")
-      |> List.first
-      |> String.split(" ");
-
-    %{ method: method,
-      path: path,
-      resp_body: "",
-      status: nil
-    }
-  end
-
-
 
   def handle_file({:ok, content}, conv ) do
     %{conv | status: 200, resp_body: content}
